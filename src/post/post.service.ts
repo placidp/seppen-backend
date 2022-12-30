@@ -17,7 +17,25 @@ export class PostService {
   }
 
   findAll() {
-    return this.repository.find();
+    return this.repository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
+  async popular() {
+    const qb = this.repository.createQueryBuilder();
+
+    qb.orderBy('views', 'DESC');
+    qb.limit(8);
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items,
+      total,
+    };
   }
 
   async findOne(id: number) {
