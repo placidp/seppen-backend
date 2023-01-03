@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { LoginUserDto } from './dto/login-user.dto';
+import { SearchUserDto } from './dto/searchg-user.dto';
 
 @Injectable()
 export class UserService {
@@ -22,21 +23,42 @@ export class UserService {
   }
 
   findById(id: number) {
-    return this.repository.findOne({ where: { id } });
+    return this.repository.findOne(id);
   }
 
   findByCond(cond: LoginUserDto) {
     const { email, password } = cond;
+    console.log(email, password);
     return this.repository.findOne({
       where: { email, password },
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: number, dto: UpdateUserDto) {
+    return this.repository.update(id, dto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async search(dto: SearchUserDto) {
+    const qb = this.repository.createQueryBuilder('u');
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 10);
+
+    if (dto.fullName) {
+      qb.andWhere(`u.fullName ILIKE :fullName`);
+    }
+
+    if (dto.email) {
+      qb.andWhere(`u.email ILIKE :email`);
+    }
+
+    qb.setParameters({
+      email: `%${dto.email}%`,
+      fullName: `%${dto.fullName}%`,
+    });
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return { items, total };
   }
 }
