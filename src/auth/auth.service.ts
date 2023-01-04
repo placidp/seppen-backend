@@ -32,7 +32,7 @@ export class AuthService {
     const { password, ...userData } = user;
     return {
       ...userData,
-      access_token: this.generateJwtToken(userData),
+      token: this.generateJwtToken(userData),
     };
   }
 
