@@ -14,6 +14,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/decorators/user.decorator';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Controller('posts')
 export class PostController {
@@ -21,7 +23,7 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
+  create(@User() user: UserEntity, @Body() createPostDto: CreatePostDto) {
     return this.postService.create(createPostDto);
   }
 

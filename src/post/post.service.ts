@@ -14,7 +14,15 @@ export class PostService {
   ) {}
 
   create(dto: CreatePostDto) {
-    return this.repository.save(dto);
+    const firstParagraph = dto.body.find(
+      (obj) => obj.type === 'paragraph',
+    )?.data;
+    return this.repository.save({
+      title: dto.title,
+      body: dto.body,
+      tags: dto.tags,
+      description: firstParagraph || '',
+    });
   }
 
   findAll() {
@@ -92,7 +100,16 @@ export class PostService {
       throw new NotFoundException('Статья не найдена');
     }
 
-    return this.repository.update(id, dto);
+    const firstParagraph = dto.body.find(
+      (obj) => obj.type === 'paragraph',
+    )?.data;
+
+    return this.repository.update(id, {
+      title: dto.title,
+      body: dto.body,
+      tags: dto.tags,
+      description: firstParagraph || '',
+    });
   }
 
   async remove(id: number) {
